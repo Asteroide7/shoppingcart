@@ -9,9 +9,12 @@ import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Badge from '@mui/material/Badge';
-// import IconButton from '@mui/material/IconButton';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import accounting from 'accounting';
+import { ActionTypes } from '../reducer';
+import {useStateValue} from '../StateProvider'
+import {useStyles} from '../CheckoutPage'
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -34,14 +37,28 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
   },
 }));
 
-export default function Product() {
+export default function Product({product: {id, nombre, tipoProducto, imagen, precio, rating, descripcion}}) {
+  const classes = useStyles();
+  const [{basket}, dispatch] = useStateValue();
   const [expanded, setExpanded] = React.useState(false);
-
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
 
-
+  const addToBasket = () => {
+    dispatch({
+      type: ActionTypes.ADD_TO_BASKET,
+      item: {
+        id,
+        nombre, 
+        tipoProducto,
+        imagen,
+        precio,
+        rating,
+        descripcion,
+      },
+    });
+  }
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardHeader
@@ -49,11 +66,11 @@ export default function Product() {
           <Typography
           variant='h5'
           color='textSecondary'>
-          $50
+          {accounting.formatMoney(precio, "$")}
           </Typography>
         }
-        title="Shoes"
-        subheader="in Stock"
+        title={nombre}
+        subheader="en Stock"
       />
       <CardMedia
       sx={{
@@ -62,19 +79,17 @@ export default function Product() {
       }}
         component="img"
         height="194"
-        image="https://s2.r29static.com/bin/entry/ebd/0,675,200,1050/x,80/1929471/image.jpg"
+        image={imagen}
         alt="Nike"
-        title='nike shoes'
+        title={nombre}
       />
       <CardContent>
         <Typography variant="body2" color="text.secondary">
-          Running shoes
+          {tipoProducto}
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
-
-
-      <IconButton aria-label="cart">
+      <IconButton aria-label="Add to cart" onClick={addToBasket}>
       <StyledBadge badgeContent={0} color="secondary">
         <ShoppingCartIcon />
       </StyledBadge>
@@ -91,7 +106,7 @@ export default function Product() {
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
           <Typography paragraph>
-            las zapatillas nike son ........
+            {descripcion}
           </Typography>
         </CardContent>
       </Collapse>
